@@ -18,14 +18,13 @@ client.on('message', async message => {
 
     const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
     const commandName = args.shift().toLowerCase();
-    const voiceChannel = message.member.voice.channel;
 
     if (!client.commands.has(commandName)) return message.reply('this command does not exist!');
 
     const command = client.commands.get(commandName);
 
     try {
-        command.execute(message, voiceChannel, args);
+        command.execute(message, args);
     } catch (error) {
         console.error(error);
         message.reply('there was an error trying to execute that command!');
