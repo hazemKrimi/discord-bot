@@ -1,7 +1,7 @@
 {
   "name": "bantoufi-discord-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "a music discord bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/hazemKrimi/bantoufi-discord-bot#readme",
   "dependencies": {
+    "@discordjs/opus": "^0.2.1",
     "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "ffmpeg-static": "^4.2.0"
   }
 }
