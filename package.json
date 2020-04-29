@@ -21,6 +21,7 @@
     "@discordjs/opus": "^0.2.1",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
-    "ffmpeg-static": "^4.2.0"
+    "ffmpeg-static": "^4.2.0",
+    "sodium": "^3.0.2"
   }
 }
