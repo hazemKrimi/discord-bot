@@ -1,38 +1,25 @@
 require('dotenv').config();
 
-const fs = require('fs');
-const Discord = require('discord.js');
+const { CommandoClient } = require('discord.js-commando');
+const path = require('path');
 
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
-}
-
-client.on('message', async message => {
-    if (!message.content.startsWith(process.env.PREFIX) || message.author.bot) return;
-
-    const args = message.content.slice(process.env.PREFIX.length).split(/ +/);
-    const commandName = args.shift().toLowerCase();
-
-    if (!client.commands.has(commandName)) return message.reply('this command does not exist!');
-
-    const command = client.commands.get(commandName);
-
-    try {
-        command.execute(message, args);
-    } catch (error) {
-        console.error(error);
-        message.reply('there was an error trying to execute that command!');
-    }
+const client = new CommandoClient({
+    commandPrefix: 'b.'
 });
 
+client.registry
+    .registerDefaultTypes()
+    .registerGroups([
+        ['music', 'Music Commands']
+    ])
+    .registerDefaultGroups()
+    .registerDefaultCommands()
+    .registerCommandsIn(path.join(__dirname, 'commands'));
+
 client.once('ready', () => {
-    console.log('ready');
+    client.user.setActivity('amsa7 lak7el');
 });
 
 client.login(process.env.BOT_TOKEN);
+
+client.on('error', console.error);
