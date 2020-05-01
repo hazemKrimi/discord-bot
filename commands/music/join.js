@@ -17,7 +17,7 @@ module.exports = class JoinCommand extends Command {
 
         if (!voiceChannel) return message.reply('you need to join a channel!');
 
-        const connection = await voiceChannel.join();
+        await voiceChannel.join();
 
         return message.say('joined!');
     }
