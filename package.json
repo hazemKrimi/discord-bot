@@ -23,6 +23,7 @@
     "discord.js-commando": "github:discordjs/Commando",
     "dotenv": "^8.2.0",
     "ffmpeg-static": "^4.2.0",
+    "puppeteer": "^3.0.2",
     "simple-youtube-api": "^5.2.1",
     "sodium": "^3.0.2",
     "ytdl-core-discord": "^1.2.0"
