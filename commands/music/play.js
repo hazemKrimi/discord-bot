@@ -1,9 +1,8 @@
 const { Command } = require('discord.js-commando');
 const puppeteer = require('puppeteer');
-// const Youtube = require('simple-youtube-api');
 const ytdl = require('ytdl-core-discord');
-const { URL } = require('url');
-// const youtube = new Youtube(process.env.YOUTUBE_API_KEY);
+const Youtube = require('simple-youtube-api');
+const youtube = new Youtube(process.env.YOUTUBE_API_KEY);
 
 module.exports = class Play extends Command {
     constructor(client) {
@@ -33,15 +32,17 @@ module.exports = class Play extends Command {
 
             const connection = await voiceChannel.join();
 
-            const link = new URL(query);
+            if (query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)) {
+                const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)[0];
 
-            if (['youtube.com', 'www.youtube.com'].includes(link.host)) {
-                const dispatcher = connection.play(await ytdl(query), { type: 'opus' });
+                const dispatcher = connection.play(await ytdl(link), { type: 'opus' });
 
                 dispatcher.on('start', () => {
                     return message.reply('youtube video is playing!');
                 });
-            } else if (['facebook.com', 'www.facebook.com'].includes(link.host)) {
+            } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)) {
+                const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)[0];
+
                 (async () => {
                     try {
                         const browser = await puppeteer.launch({
@@ -50,8 +51,8 @@ module.exports = class Play extends Command {
                         const page = await browser.newPage();
                         page.setDefaultNavigationTimeout(0);
                         page.setDefaultTimeout(0);
-                        await page.goto(query, { waitUntil: 'networkidle2' });
-                        const metaHandle = await page.$('meta[property="og:video:secure_url"]');
+                        await page.goto(link, { waitUntil: 'networkidle2' });
+                        const metaHandle = await page.$('meta[property="og:video:url"]');
                         const videoLink = await page.evaluate(meta => meta.getAttribute('content'), metaHandle);
 
                         const dispatcher = connection.play(videoLink);
@@ -60,19 +61,69 @@ module.exports = class Play extends Command {
                             return message.reply('facebook video is playing!');
                         });
                     } catch (err) {
+                        message.reply('cannot play what you requested!');
                         throw err;
                     }
                 })();
-            } else {
-                const dispatcher = connection.play(query);
+            } else if (query.match(/^(http(s)?:\/\/)?((w){3}\S)?\S+(\.)\S+\/\S+\.(\S){3}/)) {
+                const link = query.match(/^(http(s)?:\/\/)?((w){3}\S)?\S+(\.)\S+\/\S+\.(\S){3}/)[0];
+
+                const dispatcher = connection.play(link);
 
                 dispatcher.on('start', () => {
-                    return message.reply('video is playing!');
+                    return message.reply('playing!');
+                });
+            } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?\S+(\.)\S+(\/\S)?/)) {
+                const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?\S+(\.)\S+(\/\S)?/)[0];
+
+                (async () => {
+                    try {
+                        const browser = await puppeteer.launch({
+                            timeout: 0
+                        });
+                        const page = await browser.newPage();
+                        page.setDefaultNavigationTimeout(0);
+                        page.setDefaultTimeout(0);
+                        await page.goto(link, { waitUntil: 'networkidle2' });
+                        const videoHandle = await page.$('video');
+
+                        if (videoHandle) {
+                            const videoLink = await page.evaluate(video => video.getAttribute('src'), videoHandle);
+
+                            const dispatcher = connection.play(videoLink);
+
+                            dispatcher.on('start', () => {
+                                return message.reply('playing!');
+                            });
+                        } else {
+                            const audioHandle = await page.$('audio');
+
+                            if (audioHandle) {
+                                const audioLink = await page.evaluate(audio => audio.getAttribute('src'), audioHandle);
+
+                                const dispatcher = connection.play(audioLink);
+
+                                dispatcher.on('start', () => {
+                                    return message.reply('playing!');
+                                });
+                            } else return message.reply('nothing to play!');
+                        }
+                    } catch (err) {
+                        message.reply('cannot play what you requested!');
+                    }
+                })();
+            } else {
+                const videos = await youtube.searchVideos(query, 1);
+                if (!videos.length === 1) return message.reply('nothing found!');
+                const dispatcher = connection.play(await ytdl(`https://www.youtube.com/watch?v=${videos[0].raw.id.videoId}`), { type: 'opus' });
+
+                dispatcher.on('start', () => {
+                    return message.reply('youtube video is playing!');
                 });
             }
         } catch(err) {
             console.log(err);
-            return message.reply('error occured playing video from link!');
+            return message.reply('cannot play what you requested!');
         }
     }
 }
