@@ -73,45 +73,6 @@ module.exports = class Play extends Command {
                 dispatcher.on('start', () => {
                     return message.reply('playing!');
                 });
-            } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?\S+(\.)\S+(\/\S)?/)) {
-                const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?\S+(\.)\S+(\/\S)?/)[0];
-
-                (async () => {
-                    try {
-                        const browser = await puppeteer.launch({
-                            timeout: 0
-                        });
-                        const page = await browser.newPage();
-                        page.setDefaultNavigationTimeout(0);
-                        page.setDefaultTimeout(0);
-                        await page.goto(link, { waitUntil: 'networkidle2' });
-                        const videoHandle = await page.$('video');
-
-                        if (videoHandle) {
-                            const videoLink = await page.evaluate(video => video.getAttribute('src'), videoHandle);
-
-                            const dispatcher = connection.play(videoLink);
-
-                            dispatcher.on('start', () => {
-                                return message.reply('playing!');
-                            });
-                        } else {
-                            const audioHandle = await page.$('audio');
-
-                            if (audioHandle) {
-                                const audioLink = await page.evaluate(audio => audio.getAttribute('src'), audioHandle);
-
-                                const dispatcher = connection.play(audioLink);
-
-                                dispatcher.on('start', () => {
-                                    return message.reply('playing!');
-                                });
-                            } else return message.reply('nothing to play!');
-                        }
-                    } catch (err) {
-                        message.reply('cannot play what you requested!');
-                    }
-                })();
             } else {
                 const videos = await youtube.searchVideos(query, 1);
                 if (!videos.length === 1) return message.reply('nothing found!');
