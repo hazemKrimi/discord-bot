@@ -8,11 +8,15 @@ module.exports = class JoinCommand extends Command {
             group: 'music',
             description: 'joins a voice channel',
             aliases: ['summon'],
-            guildOnly: true
+            guildOnly: true,
+            throttling: {
+                usages: 1,
+                duration: 5
+            }
         });
     }
 
-    async run(message) {
+    run = async message => {
         const voiceChannel = message.member.voice.channel;
 
         if (!voiceChannel) return message.reply('you need to join a channel!');

@@ -7,11 +7,15 @@ module.exports = class Leave extends Command {
             memberName: 'leave',
             group: 'music',
             description: 'leaves a voice channel',
-            guildOnly: true
+            guildOnly: true,
+            throttling: {
+                usages: 1,
+                duration: 5
+            }
         });
     }
 
-    async run(message) {
+    run = message => {
         if (!message.member.voice.channel) return message.reply('you need to join a channel!');
 
         const voiceChannel = message.member.voice.channel;
