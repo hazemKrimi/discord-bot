@@ -145,7 +145,7 @@ module.exports = class Play extends Command {
                 }
             } else {
                 const videos = await youtube.searchVideos(query, 1);
-                if (!videos.length === 1) return message.reply('nothing found!');
+                if (videos.length !== 1) return message.reply('nothing found!');
 
                 const video = await youtube.getVideoByID(videos[0].raw.id.videoId);
 
