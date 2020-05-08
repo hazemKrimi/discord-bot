@@ -35,14 +35,45 @@ module.exports = class Play extends Command {
 
             if (!voiceChannel) return message.reply('you need to join a channel!');
 
-            if (query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)) {
+            if (query.match(/^(?!.*\?.*\bv=)https:\/\/www\.youtube\.com\/.*\?.*\blist=.*$/)) {
+                const link = query.match(/^(?!.*\?.*\bv=)https:\/\/www\.youtube\.com\/.*\?.*\blist=.*$/)[0];
+                const playlist = await youtube.getPlaylist(link);
+                const playlistVideos = await playlist.getVideos();
+
+                playlistVideos.forEach(async playlistVideo => {
+                    const video = await youtube.getVideoByID(playlistVideo.id);
+
+                    const title = video.title;
+                    const by = video.channel.title;
+                    const durationString = this.formatDuration(video.duration);
+                    const thumbnail = video.thumbnails.high.url;
+                    const data = {
+                        type: 'youtube',
+                        link: `https://www.youtube.com/watch?v=${video.id}`,
+                        title,
+                        by,
+                        duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
+                        thumbnail,
+                        voiceChannel
+                    };
+
+                    message.guild.music.queue.push(data);
+
+                    if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
+                        message.guild.music.isPlaying = true;
+                        return this.play(message.guild.music.queue, message);
+                    } else {
+                        return message.reply(`${video.title} added to queue`);
+                    }
+                });
+            } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)) {
                 const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)[0];
                 const id = link.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)[2].split(/[^0-9a-z_\-]/i)[0];
 
                 const video = await youtube.getVideoByID(id);
                 const title = video.title;
                 const by = video.channel.title;
-                const duration = this.formatDuration(video.duration);
+                const durationString = this.formatDuration(video.duration);
                 const thumbnail = video.thumbnails.high.url;
 
                 const data = {
@@ -50,7 +81,7 @@ module.exports = class Play extends Command {
                     link,
                     title,
                     by,
-                    duration: duration !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: duration } : 'Live Stream',
+                    duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
                     thumbnail,
                     voiceChannel
                 };
@@ -148,16 +179,16 @@ module.exports = class Play extends Command {
                 if (videos.length !== 1) return message.reply('nothing found!');
 
                 const video = await youtube.getVideoByID(videos[0].raw.id.videoId);
-
                 const title = video.title;
-                const duration = this.formatDuration(video.duration);
+                const by = video.channel.title;
+                const durationString = this.formatDuration(video.duration);
                 const thumbnail = video.thumbnails.high.url;
-
                 const data = {
                     type: 'search',
                     link: `https://www.youtube.com/watch?v=${video.id}`,
                     title,
-                    duration: duration !== '00:00:00' ? duration : 'Live Stream',
+                    by,
+                    duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
                     thumbnail,
                     voiceChannel
                 };
@@ -179,6 +210,8 @@ module.exports = class Play extends Command {
 
     play = async(queue, messsage) => {
         try {
+            if (queue.length === 0) return messsage.reply('queue is empty');
+
             const voiceChannel = queue[0].voiceChannel;
             const connection = await voiceChannel.join();
             let dispatcher;
