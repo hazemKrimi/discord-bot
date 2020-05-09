@@ -11,7 +11,7 @@ module.exports = class Play extends Command {
             guildOnly: true,
             throttling: {
                 usages: 1,
-                duration: 5
+                duration: 3
             }
         });
     }
@@ -28,17 +28,17 @@ module.exports = class Play extends Command {
             }
             else {
                 const voiceChannel = message.member.voice.channel;
-                message.guild.music.queue = [];
                 message.guild.music.isPlaying = false;
                 message.guild.music.nowPlaying = null;
                 message.guild.music.dispatcher = null;
+                message.guild.music.queue = [];
                 voiceChannel.leave();
                 const embed = new MessageEmbed().setColor('#000099').setTitle(':stop_button: Stopped player and cleared queue');
                 return await message.say({ embed });
             }
         } catch(err) {
             console.error(err);
-            const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Error occured, if you are my creator please fix me soon');
+            const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
             return message.say({ embed });
         }
     }

@@ -11,7 +11,7 @@ module.exports = class Play extends Command {
             guildOnly: true,
             throttling: {
                 usages: 1,
-                duration: 5
+                duration: 3
             }
         });
     }
@@ -39,7 +39,7 @@ module.exports = class Play extends Command {
             }
         } catch(err) {
             console.error(err);
-            const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Error occured, if you are my creator please fix me soon');
+            const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
             return message.say({ embed });
         }
     }
