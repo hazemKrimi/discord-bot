@@ -1,10 +1,8 @@
-// const { spawn } = require('child_process');
-const ffmpeg = require('fluent-ffmpeg');
 const { Command } = require('discord.js-commando');
 const { MessageEmbed } = require('discord.js');
-const puppeteer = require('puppeteer');
-const ytdl = require('ytdl-core-discord');
 const Youtube = require('simple-youtube-api');
+const ffmpeg = require('fluent-ffmpeg');
+const puppeteer = require('puppeteer');
 const youtube = new Youtube(process.env.YOUTUBE_API_KEY);
 
 module.exports = class Play extends Command {
@@ -26,7 +24,7 @@ module.exports = class Play extends Command {
             ],
             throttling: {
                 usages: 1,
-                duration: 5
+                duration: 3
             }
         });
     }
@@ -69,11 +67,11 @@ module.exports = class Play extends Command {
 
                     if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
                         message.guild.music.isPlaying = true;
-                        return this.play(message.guild.music.queue, message);
+                        return message.guild.play(message.guild.music.queue, message);
                     }
                 });
                 if (message.guild.music.isPlaying) {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: ${playlist.title} (${playlistVideos.length} tracks) added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${playlist.title}" (${playlistVideos.length} tracks) added to queue`);
                     return await message.say({ embed });
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)) {
@@ -100,9 +98,9 @@ module.exports = class Play extends Command {
 
                 if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
                     message.guild.music.isPlaying = true;
-                    return this.play(message.guild.music.queue, message);
+                    return message.guild.play(message.guild.music.queue, message);
                 } else {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: ${data.title} added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
                     return await message.say({ embed });
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)) {
@@ -149,9 +147,9 @@ module.exports = class Play extends Command {
 
                 if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
                     message.guild.music.isPlaying = true;
-                    return this.play(message.guild.music.queue, message);
+                    return message.guild.play(message.guild.music.queue, message);
                 } else {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: ${data.title} added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
                     return await message.say({ embed });
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}\S)?\S+(\.)\S+\/\S+\.(\S){3}/)) {
@@ -184,9 +182,9 @@ module.exports = class Play extends Command {
 
                             if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
                                 message.guild.music.isPlaying = true;
-                                return this.play(message.guild.music.queue, message);
+                                return message.guild.play(message.guild.music.queue, message);
                             } else {
-                                const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: ${data.title} added to queue`);
+                                const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
                                 return await message.say({ embed });
                             }
                         }
@@ -218,73 +216,15 @@ module.exports = class Play extends Command {
 
                 if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
                     message.guild.music.isPlaying = true;
-                    return this.play(message.guild.music.queue, message);
+                    return message.guild.play(message.guild.music.queue, message);
                 } else {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: ${data.title} added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
                     return await message.say({ embed });
                 }
             }
         } catch(err) {
             console.error(err);
             const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Track is private or I just can\'t play this for some other reason');
-            return message.say({ embed });
-        }
-    }
-
-    play = async(queue, message) => {
-        try {
-            if (queue.length === 0) {
-                const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Error occured, if you are my creator please fix me soon');
-                return await message.say({ embed });
-            }
-
-            const voiceChannel = queue[0].voiceChannel;
-            const connection = await voiceChannel.join();
-            let dispatcher;
-
-            switch (queue[0].type) {
-                case 'youtube': { dispatcher = connection.play(await ytdl(queue[0].link, { quality: 'highestaudio' }), { type: 'opus' }); break; }
-                case 'facebook': { dispatcher = connection.play(queue[0].link); break; }
-                case 'search': { dispatcher = connection.play(await ytdl(queue[0].link), { type: 'opus' }); break; }
-                case 'other': { dispatcher = connection.play(queue[0].link); break; }
-            }
-
-            dispatcher.on('start', async() => {
-                message.guild.music.nowPlaying = queue[0];
-                message.guild.startCounter(message);
-                message.guild.music.dispatcher = dispatcher;
-                dispatcher.setVolume(message.guild.music.volume);
-                const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Play`).addField('Now playing', queue[0].title);
-                if (queue[0].type === 'youtube' || queue[0].type === 'search') embed.setThumbnail(queue[0].thumbnail);
-                if (queue[0].type === 'youtube' || queue[0].type === 'search' || queue[0].type === 'facebook') embed.addField('By', queue[0].by);
-                embed.addField('Duration', queue[0].duration.string);
-                await message.say({ embed });
-                return queue.shift();
-            });
-
-            dispatcher.on('finish', async() => {
-                if (queue.length >= 1) return this.play(queue, message);
-                else {
-                    message.guild.music.isPlaying = false;
-                    message.guild.music.nowPlaying = null;
-                    message.guild.music.dispatcher = null;
-                    voiceChannel.leave();
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(':musical_note: Queue ended');
-                    return await message.say({ embed });
-                }
-            });
-
-            dispatcher.on('error', err => {
-                message.guild.music.queue = [];
-                message.guild.music.isPlaying = false;
-                message.guild.music.nowPlaying = false;
-                message.guild.music.dispatcher = null;
-                voiceChannel.leave();
-                throw err;
-            });
-        } catch (err) {
-            console.error(err);
-            const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Error occured, if you are my creator please fix me soon');
             return message.say({ embed });
         }
     }
