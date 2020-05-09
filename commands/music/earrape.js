@@ -11,7 +11,7 @@ module.exports = class Play extends Command {
             guildOnly: true,
             throttling: {
                 usages: 1,
-                duration: 5
+                duration: 3
             }
         });
     }
@@ -27,6 +27,7 @@ module.exports = class Play extends Command {
                 return message.say({ embed });
             }
             else {
+                message.guild.music.volume = message.guild.music.sfx.earrape ? 1 : 10000;
                 message.guild.music.dispatcher.setVolume(message.guild.music.sfx.earrape ? 1 : 10000);
                 message.guild.music.sfx.earrape = !message.guild.music.sfx.earrape;
                 const embed = new MessageEmbed().setColor('#000099').setTitle(`:loud_sound: Earrape ${message.guild.music.sfx.earrape ? 'on' : 'off'}`);
@@ -34,7 +35,7 @@ module.exports = class Play extends Command {
             }
         } catch (err) {
             console.error(err);
-            const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Error occured, if you are my creator please fix me soon');
+            const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
             return message.say({ embed });
         }
     }
