@@ -131,7 +131,7 @@ Structures.extend('Guild', Guild => {
 });
 
 const client = new CommandoClient({
-    commandPrefix: 'b.',
+    commandPrefix: '!',
     owner: '321673699436527617'
 });
 
