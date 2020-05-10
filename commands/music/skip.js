@@ -28,7 +28,7 @@ module.exports = class Play extends Command {
             }
             else {
                 message.guild.music.dispatcher.emit('finish');
-                const embed = new MessageEmbed().setColor('#000099').setTitle(':stop_button: Skipped current track');
+                const embed = new MessageEmbed().setColor('#000099').setTitle(':track_next: Skipped current track');
                 return await message.say({ embed });
             }
         } catch (err) {
