@@ -69,7 +69,7 @@ module.exports = class JoinCommand extends Command {
                 const video = await youtube.getVideoByID(videos[index - 1].raw.id.videoId);
                 const title = video.title;
                 const by = video.channel.title;
-                const durationString = message.guild.formatDuration(video.duration);
+                const durationString = message.guild.formatDurationString(video.duration);
                 const thumbnail = video.thumbnails.high.url;
                 const data = {
                     type: 'search',

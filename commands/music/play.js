@@ -51,7 +51,7 @@ module.exports = class Play extends Command {
 
                     const title = video.title;
                     const by = video.channel.title;
-                    const durationString = message.guild.formatDuration(video.duration);
+                    const durationString = message.guild.formatDurationString(video.duration);
                     const thumbnail = video.thumbnails.high.url;
                     const data = {
                         type: 'youtube',
@@ -81,7 +81,7 @@ module.exports = class Play extends Command {
                 const video = await youtube.getVideoByID(id);
                 const title = video.title;
                 const by = video.channel.title;
-                const durationString = message.guild.formatDuration(video.duration);
+                const durationString = message.guild.formatDurationString(video.duration);
                 const thumbnail = video.thumbnails.high.url;
 
                 const data = {
@@ -131,7 +131,7 @@ module.exports = class Play extends Command {
                     });
                 }
                 
-                const durationString = durationArr ? message.guild.formatDuration({ hours: durationArr[0], minutes: durationArr[1], seconds: durationArr[2] + 1 }) : 'Live Stream';
+                const durationString = durationArr ? message.guild.formatDurationString({ hours: durationArr[0], minutes: durationArr[1], seconds: durationArr[2] + 1 }) : 'Live Stream';
                 const title = await page.evaluate(title => title.innerText.replace(/\s\|\sfacebook/i, ''), titleHandle);
                 const videoLink = await page.evaluate(meta => meta.getAttribute('content'), metaHandle);
                 const data = {
@@ -163,7 +163,7 @@ module.exports = class Play extends Command {
                             hours: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCHours(),
                             minutes: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCMinutes(),
                             seconds: new Date(Math.ceil(metaData.format.duration) * 1000).getSeconds(),
-                            string: message.guild.formatDuration({
+                            string: message.guild.formatDurationString({
                                 hours: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCHours(),
                                 minutes: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCMinutes(),
                                 seconds: new Date(Math.ceil(metaData.format.duration) * 1000).getSeconds()
@@ -200,7 +200,7 @@ module.exports = class Play extends Command {
                 const video = await youtube.getVideoByID(videos[0].raw.id.videoId);
                 const title = video.title;
                 const by = video.channel.title;
-                const durationString = message.guild.formatDuration(video.duration);
+                const durationString = message.guild.formatDurationString(video.duration);
                 const thumbnail = video.thumbnails.high.url;
                 const data = {
                     type: 'search',
