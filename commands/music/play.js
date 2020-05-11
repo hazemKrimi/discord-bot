@@ -71,7 +71,7 @@ module.exports = class Play extends Command {
                     }
                 });
                 if (message.guild.music.isPlaying) {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${playlist.title}" (${playlistVideos.length} tracks) added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${playlist.title}" to queue (${playlistVideos.length} tracks)`);
                     return await message.say({ embed });
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)) {
@@ -100,7 +100,7 @@ module.exports = class Play extends Command {
                     message.guild.music.isPlaying = true;
                     return message.guild.play(message.guild.music.queue, message);
                 } else {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${data.title}" to queue`);
                     return await message.say({ embed });
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)) {
@@ -149,7 +149,7 @@ module.exports = class Play extends Command {
                     message.guild.music.isPlaying = true;
                     return message.guild.play(message.guild.music.queue, message);
                 } else {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${data.title}" to queue`);
                     return await message.say({ embed });
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}\S)?\S+(\.)\S+\/\S+\.(\S){3}/)) {
@@ -184,7 +184,7 @@ module.exports = class Play extends Command {
                                 message.guild.music.isPlaying = true;
                                 return message.guild.play(message.guild.music.queue, message);
                             } else {
-                                const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
+                                const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${data.title}" to queue`);
                                 return await message.say({ embed });
                             }
                         }
@@ -218,7 +218,7 @@ module.exports = class Play extends Command {
                     message.guild.music.isPlaying = true;
                     return message.guild.play(message.guild.music.queue, message);
                 } else {
-                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: "${data.title}" added to queue`);
+                    const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${data.title}" to queue`);
                     return await message.say({ embed });
                 }
             }

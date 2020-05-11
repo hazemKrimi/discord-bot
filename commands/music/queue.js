@@ -24,16 +24,14 @@ module.exports = class Play extends Command {
             } else {
                 const embed = new MessageEmbed().setColor('#000099').setTitle(':musical_note: Queue');
 
-                embed.addField('Now playing', message.guild.music.nowPlaying.title).addField('Duration', `${message.guild.music.nowPlaying.playingFor.string}/${message.guild.music.nowPlaying.duration.string}`);
+                embed
+                    .addField('Now playing', `${message.guild.music.nowPlaying.title} ${message.guild.music.nowPlaying.by && `By ${message.guild.music.nowPlaying.by}`}`)
+                    .addField('Duration', `${message.guild.music.nowPlaying.playingFor.string}/${message.guild.music.nowPlaying.duration.string}`);
 
                 if (message.guild.music.queue.length === 0) embed.addField('Queue', 'nothing in the queue');
                 else embed.addField('Queue', `${message.guild.music.queue.length} track(s)`);
 
-                message.guild.music.queue.forEach((item, index) => {
-                    let itemString = `${item.title}`;
-                    if (item.type === 'youtube' || item.type === 'search' || item.type === 'facebook') itemString += ` By ${item.by}`;
-                    embed.addField(index + 1, itemString);
-                });
+                message.guild.music.queue.forEach((item, index) => embed.addField(index + 1, `${item.title} ${item.by && `By ${item.by}`}`));
 
                 return await message.say({ embed });
             }

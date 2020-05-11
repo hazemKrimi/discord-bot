@@ -33,7 +33,7 @@ module.exports = class Play extends Command {
             else {
                 message.guild.music.paused = true;
                 message.guild.music.dispatcher.pause(true);
-                const embed = new MessageEmbed().setColor('#000099').setTitle(':pause_button: paused player');
+                const embed = new MessageEmbed().setColor('#000099').setTitle(':pause_button: Paused player');
                 return await message.say({ embed });
             }
         } catch (err) {

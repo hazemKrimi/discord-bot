@@ -30,7 +30,7 @@ module.exports = class Play extends Command {
             else {
                 message.guild.music.paused = false;
                 message.guild.music.dispatcher.resume();
-                const embed = new MessageEmbed().setColor('#000099').setTitle(':arrow_forward: resumed player');
+                const embed = new MessageEmbed().setColor('#000099').setTitle(':arrow_forward: Resumed player');
                 return await message.say({ embed });
             }
         } catch (err) {

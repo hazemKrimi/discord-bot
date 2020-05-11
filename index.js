@@ -79,47 +79,53 @@ Structures.extend('Guild', Guild => {
         }
 
         startCounter = message => {
-            if (!message.guild.music.nowPlaying.playingFor) message.guild.music.nowPlaying.playingFor = { hours: 0, minutes: 0, seconds: 0, string: '00:00:00' };
-            
-            const interval = setInterval(() => {
-                if (!message.guild.music.nowPlaying || message.guild.music.paused) clearInterval(interval);
-                else if (message.guild.music.nowPlaying.playingFor.seconds === 60) {
-                    message.guild.music.nowPlaying.playingFor = { 
-                        hours: message.guild.music.nowPlaying.playingFor.hours,
-                        minutes: message.guild.music.nowPlaying.playingFor.minutes + 1,
-                        seconds: 0,
-                        string: this.formatDuration({ 
+            try {
+                if (!message.guild.music.nowPlaying.playingFor) message.guild.music.nowPlaying.playingFor = { hours: 0, minutes: 0, seconds: 0, string: '00:00:00' };
+
+                const interval = setInterval(() => {
+                    if (!message.guild.music.nowPlaying || message.guild.music.paused) clearInterval(interval);
+                    else if (message.guild.music.nowPlaying.playingFor.seconds === 60) {
+                        message.guild.music.nowPlaying.playingFor = {
                             hours: message.guild.music.nowPlaying.playingFor.hours,
                             minutes: message.guild.music.nowPlaying.playingFor.minutes + 1,
-                            seconds: 0 
-                        }) 
-                    };
-                }
-                else if (message.guild.music.nowPlaying.playingFor.minutes === 60) {
-                    message.guild.music.nowPlaying.playingFor = { 
-                        hours: message.guild.music.nowPlaying.playingFor.hours + 1,
-                        minutes: 0,
-                        seconds: 0,
-                        string: this.formatDuration({ 
+                            seconds: 0,
+                            string: this.formatDuration({
+                                hours: message.guild.music.nowPlaying.playingFor.hours,
+                                minutes: message.guild.music.nowPlaying.playingFor.minutes + 1,
+                                seconds: 0
+                            })
+                        };
+                    }
+                    else if (message.guild.music.nowPlaying.playingFor.minutes === 60) {
+                        message.guild.music.nowPlaying.playingFor = {
                             hours: message.guild.music.nowPlaying.playingFor.hours + 1,
                             minutes: 0,
-                            seconds: 0 
-                        }) 
-                    };
-                }
-                else {
-                    message.guild.music.nowPlaying.playingFor = { 
-                        hours: message.guild.music.nowPlaying.playingFor.hours,
-                        minutes: message.guild.music.nowPlaying.playingFor.minutes,
-                        seconds: message.guild.music.nowPlaying.playingFor.seconds + 1,
-                        string: this.formatDuration({ 
+                            seconds: 0,
+                            string: this.formatDuration({
+                                hours: message.guild.music.nowPlaying.playingFor.hours + 1,
+                                minutes: 0,
+                                seconds: 0
+                            })
+                        };
+                    }
+                    else {
+                        message.guild.music.nowPlaying.playingFor = {
                             hours: message.guild.music.nowPlaying.playingFor.hours,
                             minutes: message.guild.music.nowPlaying.playingFor.minutes,
-                            seconds: message.guild.music.nowPlaying.playingFor.seconds + 1
-                        }) 
-                    };
-                }
-            }, 1000);
+                            seconds: message.guild.music.nowPlaying.playingFor.seconds + 1,
+                            string: this.formatDuration({
+                                hours: message.guild.music.nowPlaying.playingFor.hours,
+                                minutes: message.guild.music.nowPlaying.playingFor.minutes,
+                                seconds: message.guild.music.nowPlaying.playingFor.seconds + 1
+                            })
+                        };
+                    }
+                }, 1000);
+            } catch(err) {
+                console.error(err);
+                const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
+                return message.say({ embed });
+            }
         }
 
         formatDuration = durationObject => {
