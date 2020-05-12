@@ -1,8 +1,19 @@
 const { CommandoClient } = require('discord.js-commando');
 const { Structures } = require('discord.js');
 const { MessageEmbed } = require('discord.js');
-const path = require('path');
+const winston = require('winston');
 const ytdl = require('ytdl-core');
+const path = require('path');
+
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs.log' }),
+    ],
+    format: winston.format.combine(
+        winston.format.printf(log => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - [${log.level.toUpperCase()}] - ${log.message}`),
+    )
+});
 
 Structures.extend('Guild', Guild => {
     class MusicGuild extends Guild {
@@ -89,8 +100,8 @@ Structures.extend('Guild', Guild => {
                     voiceChannel.leave();
                     throw err;
                 });
-            } catch (err) {
-                console.error(err);
+            } catch(err) {
+                logger.log('error', err);
                 const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
                 return message.say({ embed });
             }
@@ -140,7 +151,7 @@ Structures.extend('Guild', Guild => {
                     }
                 }, 1000);
             } catch(err) {
-                console.error(err);
+                logger.log('error', err);
                 const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
                 return message.say({ embed });
             }
@@ -183,8 +194,10 @@ client.once('ready', () => {
     client.user.setActivity('amsa7 lak7el');
 });
 
+client.on('debug', msg => logger.log('debug', msg));
+client.on('warn', msg => logger.log('warn', msg));
+client.on('error', msg => logger.log('error', msg));
+
+process.on('unhandledRejection', err => logger.log('error', err));
+
 client.login(process.env.BOT_TOKEN);
-
-client.on('error', console.error);
-
-process.on('unhandledRejection', error => console.error('Uncaught Promise Rejection', error));

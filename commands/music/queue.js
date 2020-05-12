@@ -1,5 +1,16 @@
 const { Command } = require('discord.js-commando');
 const { MessageEmbed } = require('discord.js');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs.log' }),
+    ],
+    format: winston.format.combine(
+        winston.format.printf(log => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - [${log.level.toUpperCase()}] - ${log.message}`),
+    )
+});
 
 module.exports = class Play extends Command {
     constructor(client) {
@@ -36,7 +47,7 @@ module.exports = class Play extends Command {
                 return await message.say({ embed });
             }
         } catch(err) {
-            console.error(err);
+            logger.log('error', err);
             const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
             return message.say({ embed });
         }

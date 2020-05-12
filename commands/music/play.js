@@ -4,6 +4,17 @@ const Youtube = require('simple-youtube-api');
 const ffmpeg = require('fluent-ffmpeg');
 const puppeteer = require('puppeteer');
 const youtube = new Youtube(process.env.YOUTUBE_API_KEY);
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs.log' }),
+    ],
+    format: winston.format.combine(
+        winston.format.printf(log => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - [${log.level.toUpperCase()}] - ${log.message}`),
+    )
+});
 
 module.exports = class Play extends Command {
     constructor(client) {
@@ -223,7 +234,7 @@ module.exports = class Play extends Command {
                 }
             }
         } catch(err) {
-            console.error(err);
+            logger.log('error', err);
             const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Track is private or I just can\'t play this for some other reason');
             return message.say({ embed });
         }

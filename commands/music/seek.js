@@ -1,5 +1,16 @@
 const { Command } = require('discord.js-commando');
 const { MessageEmbed } = require('discord.js');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs.log' }),
+    ],
+    format: winston.format.combine(
+        winston.format.printf(log => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - [${log.level.toUpperCase()}] - ${log.message}`),
+    )
+});
 
 module.exports = class JoinCommand extends Command {
     constructor(client) {
@@ -12,7 +23,7 @@ module.exports = class JoinCommand extends Command {
             args: [
                 {
                     key: 'query',
-                    prompt: 'where do you want to seek?',
+                    prompt: 'to what time do you want to seek? (HH:MM:SS)',
                     type: 'string',
                     validate: query => query.length > 0 && query.match(/(\d+:)?\d{2}:\d{2}/)
                 }
@@ -48,8 +59,8 @@ module.exports = class JoinCommand extends Command {
                 const embed = new MessageEmbed().setColor('#000099').setTitle(`:musical_note: Sought to ${query}`);
                 return await message.say({ embed });
             }
-        } catch (err) {
-            console.error(err);
+        } catch(err) {
+            logger.log('error', err);
             const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
             return message.say({ embed });
         }

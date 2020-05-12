@@ -2,6 +2,17 @@ const { Command } = require('discord.js-commando');
 const { MessageEmbed } = require('discord.js');
 const Youtube = require('simple-youtube-api');
 const youtube = new Youtube(process.env.YOUTUBE_API_KEY);
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs.log' }),
+    ],
+    format: winston.format.combine(
+        winston.format.printf(log => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - [${log.level.toUpperCase()}] - ${log.message}`),
+    )
+});
 
 module.exports = class JoinCommand extends Command {
     constructor(client) {
@@ -14,7 +25,7 @@ module.exports = class JoinCommand extends Command {
             args: [
                 {
                     key: 'query',
-                    prompt: 'what do you want to listen to?',
+                    prompt: 'what do you want to search for in youtube?',
                     type: 'string',
                     validate: query => query.length > 0
                 }
@@ -91,8 +102,8 @@ module.exports = class JoinCommand extends Command {
                     return await message.say({ embed });
                 }
             }
-        } catch (err) {
-            console.error(err);
+        } catch(err) {
+            logger.log('error', err);
             const embed = new MessageEmbed().setColor('#ff0000').setTitle(`:x: Error occured: ${err.message}`);
             return message.say({ embed });
         }
