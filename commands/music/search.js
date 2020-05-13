@@ -78,17 +78,14 @@ module.exports = class JoinCommand extends Command {
                 }
                 
                 const video = await youtube.getVideoByID(videos[index - 1].raw.id.videoId);
-                const title = video.title;
-                const by = video.channel.title;
-                const durationString = message.guild.formatDurationString(video.duration);
-                const thumbnail = video.thumbnails.high.url;
+                const durationString = message.guild.formatDurationString(video.duration.hours, video.duration.minutes, video.duration.seconds);
                 const data = {
-                    type: 'search',
+                    type: 'youtube',
                     link: `https://www.youtube.com/watch?v=${video.id}`,
-                    title,
-                    by,
-                    duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
-                    thumbnail,
+                    title: video.title,
+                    by: video.channel.title,
+                    duration: durationString !== '00:00:00' ? durationString : 'Live Stream',
+                    thumbnail: video.thumbnails.high.url,
                     voiceChannel
                 };
 

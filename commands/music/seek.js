@@ -25,7 +25,7 @@ module.exports = class JoinCommand extends Command {
                     key: 'query',
                     prompt: 'to what time do you want to seek? (HH:MM:SS)',
                     type: 'string',
-                    validate: query => query.length > 0 && query.match(/(\d+:)?\d{2}:\d{2}/)
+                    validate: query => query.length > 0 && query.match(/\d+:\d{2}:\d{2}/)
                 }
             ],
             throttling: {
@@ -46,15 +46,13 @@ module.exports = class JoinCommand extends Command {
                 return await message.say({ embed });
             }
             else {
-                const seekDuration = message.guild.formatDurationObject(query);
-                const seekSeconds = seekDuration.hours * 3600 + seekDuration.minutes * 60 + seekDuration.seconds; 
-                const nowplayingSeconds = message.guild.music.nowPlaying.duration.hours * 3600 + message.guild.music.nowPlaying.duration.minutes * 60 + message.guild.music.nowPlaying.duration.seconds;
+                const seekSeconds = message.guild.formatDurationSeconds(query);
+                const nowplayingSeconds = message.guild.formatDurationSeconds(message.guild.music.nowPlaying.duration);
                 if (seekSeconds > nowplayingSeconds) {
                     const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Seek time is greater than track time');
                     return await message.say({ embed });
                 }
                 message.guild.music.seek = seekSeconds;
-                message.guild.music.nowPlaying.playingFor = { hours: seekDuration.hours, minutes: seekDuration.minutes, seconds: seekDuration.seconds, string: message.guild.formatDurationString(seekDuration) };
                 await message.guild.play(message.guild.music.queue, message);
                 const embed = new MessageEmbed().setColor('#000099').setTitle(`:musical_note: Sought to ${query}`);
                 return await message.say({ embed });

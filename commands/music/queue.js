@@ -34,10 +34,10 @@ module.exports = class Play extends Command {
                 return await message.say({ embed });
             } else {
                 const embed = new MessageEmbed().setColor('#000099').setTitle(':musical_note: Queue');
+                const time = message.guild.music.seek ? message.guild.music.dispatcher.streamTime + message.guild.music.seek * 1000 : message.guild.music.dispatcher.streamTime;
+                const timeString = message.guild.formatDurationString(new Date(time).getUTCHours(), new Date(time).getUTCMinutes(), new Date(time).getSeconds());
 
-                embed
-                    .addField('Now playing', `${message.guild.music.nowPlaying.title} ${message.guild.music.nowPlaying.by && `By ${message.guild.music.nowPlaying.by}`}`)
-                    .addField('Duration', `${message.guild.music.nowPlaying.playingFor.string}/${message.guild.music.nowPlaying.duration.string}`);
+                embed.addField('Now playing', message.guild.music.nowPlaying.title).addField('Duration', `${timeString}/${message.guild.music.nowPlaying.duration}`);
 
                 if (message.guild.music.queue.length === 0) embed.addField('Queue', 'nothing in the queue');
                 else embed.addField('Queue', `${message.guild.music.queue.length} track(s)`);

@@ -59,24 +59,20 @@ module.exports = class Play extends Command {
 
                 playlistVideos.forEach(async playlistVideo => {
                     const video = await youtube.getVideoByID(playlistVideo.id);
-
-                    const title = video.title;
-                    const by = video.channel.title;
-                    const durationString = message.guild.formatDurationString(video.duration);
-                    const thumbnail = video.thumbnails.high.url;
+                    const durationString = message.guild.formatDurationString(video.duration.hours, video.duration.minutes, video.duration.seconds);
                     const data = {
                         type: 'youtube',
                         link: `https://www.youtube.com/watch?v=${video.id}`,
-                        title,
-                        by,
-                        duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
-                        thumbnail,
+                        title: video.title,
+                        by: video.channel.title,
+                        duration: durationString !== '00:00:00' ? durationString : 'Live Stream',
+                        thumbnail: video.thumbnails.high.url,
                         voiceChannel
                     };
 
                     message.guild.music.queue.push(data);
 
-                    if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
+                    if (!message.guild.music.isPlaying) {
                         message.guild.music.isPlaying = true;
                         return message.guild.play(message.guild.music.queue, message);
                     }
@@ -88,26 +84,21 @@ module.exports = class Play extends Command {
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)) {
                 const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/\S+/)[0];
                 const id = link.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)[2].split(/[^0-9a-z_\-]/i)[0];
-
                 const video = await youtube.getVideoByID(id);
-                const title = video.title;
-                const by = video.channel.title;
-                const durationString = message.guild.formatDurationString(video.duration);
-                const thumbnail = video.thumbnails.high.url;
-
+                const durationString = message.guild.formatDurationString(video.duration.hours, video.duration.minutes, video.duration.seconds);
                 const data = {
                     type: 'youtube',
                     link,
-                    title,
-                    by,
-                    duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
-                    thumbnail,
+                    title: video.title,
+                    by: video.channel.title,
+                    duration: durationString !== '00:00:00' ? durationString : 'Live Stream',
+                    thumbnail: video.thumbnails.high.url,
                     voiceChannel
                 };
 
                 message.guild.music.queue.push(data);
 
-                if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
+                if (!message.guild.music.isPlaying) {
                     message.guild.music.isPlaying = true;
                     return message.guild.play(message.guild.music.queue, message);
                 } else {
@@ -116,10 +107,7 @@ module.exports = class Play extends Command {
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)) {
                 const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)[0];
-
-                const browser = await puppeteer.launch({
-                    timeout: 0
-                });
+                const browser = await puppeteer.launch({ timeout: 0 });
                 const page = await browser.newPage();
 
                 page.setDefaultNavigationTimeout(0);
@@ -142,7 +130,7 @@ module.exports = class Play extends Command {
                     });
                 }
                 
-                const durationString = durationArr ? message.guild.formatDurationString({ hours: durationArr[0], minutes: durationArr[1], seconds: durationArr[2] + 1 }) : 'Live Stream';
+                const durationString = durationArr ? message.guild.formatDurationString(durationArr[0], durationArr[1], durationArr[2] + 1) : 'Live Stream';
                 const title = await page.evaluate(title => title.innerText.replace(/\s\|\sfacebook/i, ''), titleHandle);
                 const videoLink = await page.evaluate(meta => meta.getAttribute('content'), metaHandle);
                 const data = {
@@ -150,13 +138,13 @@ module.exports = class Play extends Command {
                     link: videoLink,
                     title: title.split(' - ')[1],
                     by: title.split(' - ')[0],
-                    duration: durationString !== 'Live Stream' ? { hours: durationArr[0], minutes: durationArr[1], seconds: durationArr[2] + 1, string: durationString } : durationString,
+                    duration: durationString,
                     voiceChannel
                 };
 
                 message.guild.music.queue.push(data);
 
-                if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
+                if (!message.guild.music.isPlaying) {
                     message.guild.music.isPlaying = true;
                     return message.guild.play(message.guild.music.queue, message);
                 } else {
@@ -169,63 +157,55 @@ module.exports = class Play extends Command {
 
                 ffmpeg.ffprobe(link, async(err, metaData) => {
                     if (err) throw err;
-                    else {
-                        const duration = {
-                            hours: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCHours(),
-                            minutes: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCMinutes(),
-                            seconds: new Date(Math.ceil(metaData.format.duration) * 1000).getSeconds(),
-                            string: message.guild.formatDurationString({
-                                hours: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCHours(),
-                                minutes: new Date(Math.ceil(metaData.format.duration) * 1000).getUTCMinutes(),
-                                seconds: new Date(Math.ceil(metaData.format.duration) * 1000).getSeconds()
-                            })
-                        };
-                        const data = {
-                            type: 'other',
-                            link,
-                            title,
-                            duration,
-                            voiceChannel
-                        };
+                    const duration = message.guild.formatDurationString(
+                        new Date(Math.ceil(metaData.format.duration) * 1000).getUTCHours(),
+                        new Date(Math.ceil(metaData.format.duration) * 1000).getUTCMinutes(),
+                        new Date(Math.ceil(metaData.format.duration) * 1000).getSeconds()
+                    );
 
-                        if (data) {
-                            message.guild.music.queue.push(data);
+                    const data = {
+                        type: 'other',
+                        link,
+                        title,
+                        duration,
+                        voiceChannel
+                    };
 
-                            if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
-                                message.guild.music.isPlaying = true;
-                                return message.guild.play(message.guild.music.queue, message);
-                            } else {
-                                const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${data.title}" to queue`);
-                                return await message.say({ embed });
-                            }
+                    if (data) {
+                        message.guild.music.queue.push(data);
+
+                        if (!message.guild.music.isPlaying) {
+                            message.guild.music.isPlaying = true;
+                            return message.guild.play(message.guild.music.queue, message);
+                        } else {
+                            const embed = new MessageEmbed().setColor('#000099').setTitle(`:arrow_forward: Added "${data.title}" to queue`);
+                            return await message.say({ embed });
                         }
                     }
                 });
             } else {
                 const videos = await youtube.searchVideos(query, 1);
+                
                 if (videos.length !== 1) {
                     const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Nothing found');
                     return await message.say({ embed });
                 }
 
                 const video = await youtube.getVideoByID(videos[0].raw.id.videoId);
-                const title = video.title;
-                const by = video.channel.title;
-                const durationString = message.guild.formatDurationString(video.duration);
-                const thumbnail = video.thumbnails.high.url;
+                const durationString = message.guild.formatDurationString(video.duration.hours, video.duration.minutes, video.duration.seconds);
                 const data = {
-                    type: 'search',
+                    type: 'youtube',
                     link: `https://www.youtube.com/watch?v=${video.id}`,
-                    title,
-                    by,
-                    duration: durationString !== '00:00:00' ? { hours: video.duration.hours, minutes: video.duration.minutes, seconds: video.duration.seconds, string: durationString } : 'Live Stream',
-                    thumbnail,
+                    title: video.title,
+                    by: video.channel.title,
+                    duration: durationString !== '00:00:00' ? durationString : 'Live Stream',
+                    thumbnail: video.thumbnails.high.url,
                     voiceChannel
                 };
 
                 message.guild.music.queue.push(data);
 
-                if (message.guild.music.isPlaying === false || message.guild.music.isPlaying === undefined) {
+                if (!message.guild.music.isPlaying) {
                     message.guild.music.isPlaying = true;
                     return message.guild.play(message.guild.music.queue, message);
                 } else {
@@ -235,7 +215,7 @@ module.exports = class Play extends Command {
             }
         } catch(err) {
             logger.log('error', err);
-            const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Track is private or I just can\'t play this for some other reason');
+            const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Cannot play this track');
             return message.say({ embed });
         }
     }

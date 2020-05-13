@@ -42,6 +42,7 @@ module.exports = class Play extends Command {
                 message.guild.music.isPlaying = false;
                 message.guild.music.nowPlaying = null;
                 message.guild.music.dispatcher = null;
+                message.guild.music.seek = null;
                 message.guild.music.queue = [];
                 voiceChannel.leave();
                 const embed = new MessageEmbed().setColor('#000099').setTitle(':stop_button: Stopped player and cleared queue');
