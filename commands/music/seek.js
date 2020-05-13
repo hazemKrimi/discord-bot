@@ -25,7 +25,7 @@ module.exports = class JoinCommand extends Command {
                     key: 'query',
                     prompt: 'to what time do you want to seek? (HH:MM:SS)',
                     type: 'string',
-                    validate: query => query.length > 0 && query.match(/\d+:\d{2}:\d{2}/)
+                    validate: query => query.length > 0 && query.match(/(\d+:)?(\d{2}:)?\d{2}/)
                 }
             ],
             throttling: {
@@ -54,7 +54,7 @@ module.exports = class JoinCommand extends Command {
                 }
                 message.guild.music.seek = seekSeconds;
                 await message.guild.play(message.guild.music.queue, message);
-                const embed = new MessageEmbed().setColor('#000099').setTitle(`:musical_note: Sought to ${query}`);
+                const embed = new MessageEmbed().setColor('#000099').setTitle(`:musical_note: Sought to ${message.guild.formatDurationString(Math.floor(seekSeconds / 3600), Math.floor(seekSeconds / 60), seekSeconds % 60)}`);
                 return await message.say({ embed });
             }
         } catch(err) {

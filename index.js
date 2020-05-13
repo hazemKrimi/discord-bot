@@ -104,11 +104,15 @@ Structures.extend('Guild', Guild => {
         }
 
         formatDurationSeconds = durationString => {
-            if (!durationString.match(/\d+:\d{2}:\d{2}/)) return;
+            if (!durationString.match(/(\d+:)?(\d{2}:)?\d{2}/)) return;
             
             const time = durationString.split(':').map(time => parseInt(time));
 
-            return time[0] * 3600 + time[1] * 60 + time[2];
+            switch (time.length) {
+                case 3: return time[0] * 3600 + time[1] * 60 + time[2];
+                case 2: return time[0] * 60 + time[1];
+                case 1: return time[0];
+            }
         }
     }
 
