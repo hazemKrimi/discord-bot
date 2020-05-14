@@ -25,6 +25,7 @@ Structures.extend('Guild', Guild => {
                 nowPlaying: null,
                 volume: 1,
                 dispatcher: null,
+                paused: false,
                 seek: null,
                 sfx: {
                     earrape: false
@@ -77,6 +78,7 @@ Structures.extend('Guild', Guild => {
                     message.guild.music.isPlaying = false;
                     message.guild.music.nowPlaying = null;
                     message.guild.music.dispatcher = null;
+                    message.guild.music.paused = false;
                     message.guild.music.seek = null;
                     voiceChannel.leave();
                     const embed = new MessageEmbed().setColor('#000099').setTitle(':musical_note: Queue ended');
@@ -88,6 +90,7 @@ Structures.extend('Guild', Guild => {
                     message.guild.music.isPlaying = false;
                     message.guild.music.nowPlaying = false;
                     message.guild.music.dispatcher = null;
+                    message.guild.music.paused = false;
                     message.guild.music.seek = null;
                     voiceChannel.leave();
                     throw err;
