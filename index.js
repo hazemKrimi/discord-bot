@@ -39,6 +39,8 @@ Structures.extend('Guild', Guild => {
 
                 const voiceChannel = !message.guild.music.seek ? queue[0].voiceChannel : message.guild.music.nowPlaying.voiceChannel;
                 const connection = await voiceChannel.join();
+                
+                message.guild.music.paused = false;
 
                 let dispatcher;
 
@@ -78,7 +80,6 @@ Structures.extend('Guild', Guild => {
                     message.guild.music.isPlaying = false;
                     message.guild.music.nowPlaying = null;
                     message.guild.music.dispatcher = null;
-                    message.guild.music.paused = false;
                     message.guild.music.seek = null;
                     voiceChannel.leave();
                     const embed = new MessageEmbed().setColor('#000099').setTitle(':musical_note: Queue ended');
@@ -90,7 +91,6 @@ Structures.extend('Guild', Guild => {
                     message.guild.music.isPlaying = false;
                     message.guild.music.nowPlaying = false;
                     message.guild.music.dispatcher = null;
-                    message.guild.music.paused = false;
                     message.guild.music.seek = null;
                     voiceChannel.leave();
                     throw err;

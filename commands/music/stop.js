@@ -42,7 +42,6 @@ module.exports = class Play extends Command {
                 message.guild.music.isPlaying = false;
                 message.guild.music.nowPlaying = null;
                 message.guild.music.dispatcher = null;
-                message.guild.music.paused = false;
                 message.guild.music.seek = null;
                 message.guild.music.queue = [];
                 voiceChannel.leave();
