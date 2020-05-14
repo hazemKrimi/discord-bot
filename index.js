@@ -39,7 +39,7 @@ Structures.extend('Guild', Guild => {
 
                 const voiceChannel = !message.guild.music.seek ? queue[0].voiceChannel : message.guild.music.nowPlaying.voiceChannel;
                 const connection = await voiceChannel.join();
-                
+
                 message.guild.music.paused = false;
 
                 let dispatcher;
@@ -68,8 +68,8 @@ Structures.extend('Guild', Guild => {
                         if (queue[0].type !== 'other') embed.addField('By', queue[0].by);
                         embed.addField('Duration', queue[0].duration);
                         await message.say({ embed });
+                        return queue.shift();
                     }
-                    return queue.shift();
                 });
 
                 dispatcher.on('finish', async () => {
