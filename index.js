@@ -120,8 +120,8 @@ Structures.extend('Guild', Guild => {
 });
 
 const client = new CommandoClient({
-    commandPrefix: '!',
-    owner: '321673699436527617'
+    commandPrefix: process.env.PREFIX,
+    owner: process.env.OWNER_ID
 });
 
 client.registry
