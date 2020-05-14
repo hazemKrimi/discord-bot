@@ -27,17 +27,12 @@ module.exports = class Play extends Command {
         });
     }
 
-    run = async (message) => {
+    run = async message => {
         try {
             if (!message.member.voice.channel) {
                 const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: You need to join a voice channel first');
                 return await message.say({ embed });
-            }
-            else if (!message.guild.music.isPlaying) {
-                const embed = new MessageEmbed().setColor('#ff0000').setTitle(':x: Play something first');
-                return message.say({ embed });
-            }
-            else {
+            } else {
                 message.guild.music.volume = message.guild.music.sfx.earrape ? 1 : 10000;
                 message.guild.music.dispatcher.setVolume(message.guild.music.sfx.earrape ? 1 : 10000);
                 message.guild.music.sfx.earrape = !message.guild.music.sfx.earrape;
