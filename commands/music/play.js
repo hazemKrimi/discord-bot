@@ -107,7 +107,7 @@ module.exports = class Play extends Command {
                 }
             } else if (query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)) {
                 const link = query.match(/^(http(s)?:\/\/)?((w){3}.)?facebook?(\.com)?\/\S+\/videos\/\S+/)[0];
-                const browser = await puppeteer.launch({ timeout: 0 });
+                const browser = await puppeteer.launch({ timeout: 0, args: ['--no-sandbox'] });
                 const page = await browser.newPage();
 
                 page.setDefaultNavigationTimeout(0);
