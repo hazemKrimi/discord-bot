@@ -2,7 +2,7 @@
 Simply a discord bot that plays audio tracks from facebook, youtube and podcast websites 
 
 # Development
-For development you need the following node modules installed globally:
+For development on Windows you need the following node modules installed globally:
 * node-gyp
 ```
 npm install -g node-gyp
