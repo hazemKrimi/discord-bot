@@ -1,5 +1,25 @@
 # Bantoufi Discord Bot
 Simply a discord bot that plays audio tracks from facebook, youtube and podcast websites 
+
+# Development
+For development you need the following node modules installed globally:
+* node-gyp
+```
+npm install -g node-gyp
+```
+* node-pre-gyp
+```
+npm install -g node-pre-gyp
+```
+* patch-package
+```
+npm install -g patch-package
+```
+* windows-build-tools
+```
+npm install --g --production --vs2015 --add-python-to-path windows-build-tools
+```
+
 # Deployment to Heroku
 1. Fork this repository
 1. Create an app on Heroku
