@@ -17,7 +17,7 @@ npm install -g patch-package
 ```
 * windows-build-tools
 ```
-npm install --g --production --vs2015 --add-python-to-path windows-build-tools
+npm install --global --production --vs2015 --add-python-to-path windows-build-tools
 ```
 
 # Deployment to Heroku
