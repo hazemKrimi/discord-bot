@@ -22,9 +22,9 @@ npm install --global --production --vs2015 --add-python-to-path windows-build-to
 
 # Deployment to Heroku
 1. Fork this repository
-1. Create an app on Heroku
-1. Connect the app with your forked repository
-1. Add these buildpacks: [Ffmpeg buildpack](https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git) and [Puppeteer buildpack](https://github.com/jontewks/puppeteer-heroku-buildpack.git)
+1. Create an app on [Heroku](https://www.heroku.com)
+1. Connect the app with your forked repository ![](/screenshots/heroku-connect-repo.png)
+1. Add these buildpacks: [Ffmpeg buildpack](https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git) and [Puppeteer buildpack](https://github.com/jontewks/puppeteer-heroku-buildpack.git) ![](/screenshots/heroku-add-buildpacks.png)
 1. Deploy
 
 Check this [video](https://www.youtube.com/watch?v=f3wsxbMbi5M) for a detailed guide
