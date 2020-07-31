@@ -1,5 +1,5 @@
-# Bantoufi Discord Bot
-Simply a discord bot that plays audio tracks from facebook, youtube and podcast websites 
+# Discord Bot
+A bot that plays audio tracks from facebook, youtube and podcast websites
 
 # Development
 For development on Windows you need the following node modules installed globally:
