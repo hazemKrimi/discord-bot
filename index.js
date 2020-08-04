@@ -137,7 +137,7 @@ client.registry
     .registerCommandsIn(path.join(__dirname, 'commands'));
 
 client.once('ready', () => {
-    client.user.setActivity('amsa7 lak7el');
+    client.user.setActivity(process.env.STATUS || 'amsa7 lak7el');
 });
 
 client.on('debug', msg => logger.log('debug', msg));
