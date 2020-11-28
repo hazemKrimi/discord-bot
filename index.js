@@ -1,3 +1,5 @@
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+
 const { CommandoClient } = require('discord.js-commando');
 const { Structures } = require('discord.js');
 const { MessageEmbed } = require('discord.js');
