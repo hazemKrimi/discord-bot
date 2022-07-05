@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/hazemKrimi/bantoufi-discord-bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.2.1",
+    "@discordjs/opus": "^0.8.0",
     "discord.js": "^12.2.0",
     "discord.js-commando": "github:discordjs/Commando",
     "fluent-ffmpeg": "^2.1.2",
